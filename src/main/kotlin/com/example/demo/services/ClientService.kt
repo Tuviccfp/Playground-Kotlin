@@ -14,6 +14,7 @@ class ClientService (private val clientRepository: ClientRepository)  {
     fun findClientById(id: String): Client? {
         return clientRepository.findById(id).orElse(null);
     }
+
     fun save(client: Client) {
         clientRepository.save(client);
     }
