@@ -24,22 +24,22 @@ class ClientController (private val clientService: ClientService) {
     }
 
     @GetMapping(value = ["/get-usuarios"])
-    fun searchByAll() : ResponseEntity<out Any> {
+    fun searchByAll() : ResponseEntity<List<Client>> {
         try {
             val result = clientService.findAllClients();
             return ResponseEntity.status(HttpStatus.OK).body(result);
         } catch (e: NotFoundException) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Não foi possível acessar o DB.")
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(emptyList())
         }
     }
 
     @GetMapping(value = ["/get-usuarios/{id}"])
-    fun findById(@PathVariable("id") id: String): ResponseEntity<out Serializable> {
+    fun findById(@PathVariable("id") id: String): ResponseEntity<Client> {
         try {
             val result = clientService.findClientById(id);
             return ResponseEntity.status(HttpStatus.OK).body(result);
         } catch (e: NotFoundException) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null)
         }
     }
 
@@ -47,18 +47,19 @@ class ClientController (private val clientService: ClientService) {
     fun updatedClient(@PathVariable id: String, @RequestBody client: Client): ResponseEntity<String> {
         try {
             clientService.update(id, client);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Alterado com sucesso")
+            return ResponseEntity.status(HttpStatus.OK).body("Alterado com sucesso")
         } catch (e: ChangeSetPersister.NotFoundException) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Erro ao atualizar o client")
         }
     }
 
     @DeleteMapping(value = ["/delete-usuarios/{id}"])
-    fun deleteById(@PathVariable("id") id: String): Any {
+    fun deleteById(@PathVariable("id") id: String): ResponseEntity<String> {
         try {
-            return clientService.delete(id)
+            clientService.delete(id)
+            return ResponseEntity.status(HttpStatus.OK).body("Deletado com sucesso")
         } catch (e: Exception) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao deletar o client")
         }
     }
 }
