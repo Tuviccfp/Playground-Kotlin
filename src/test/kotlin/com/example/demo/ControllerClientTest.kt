@@ -54,7 +54,7 @@ class ControllerClientTest {
         val listResult = clientController.searchByAll()
         assertEquals(listResult.body, listClient)
         assertEquals(HttpStatus.OK, listResult.statusCode)
-        listResult.body?.let { assertEquals(1, it) }
+        listResult.body?.let { assertEquals(1, it.size) }
         assertNotNull(listResult)
 
         Mockito.verify(clientService, Mockito.times(1)).findAllClients()
