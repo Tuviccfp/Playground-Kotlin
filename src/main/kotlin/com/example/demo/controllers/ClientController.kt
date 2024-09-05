@@ -15,51 +15,31 @@ import java.io.Serializable
 class ClientController (private val clientService: ClientService) {
     @PostMapping(value = ["/save-usuários"])
     fun createdClient(@RequestBody client: Client): ResponseEntity<String> {
-        try {
-            clientService.save(client);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Criado com sucesso");
-        } catch (e: NotFoundException) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao criar um novo cliente.")
-        }
+        clientService.save(client);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Criado com sucesso");
     }
 
     @GetMapping(value = ["/get-usuarios"])
     fun searchByAll() : ResponseEntity<List<Client>> {
-        try {
-            val result = clientService.findAllClients();
-            return ResponseEntity.status(HttpStatus.OK).body(result);
-        } catch (e: NotFoundException) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(emptyList())
-        }
+        val result = clientService.findAllClients();
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     @GetMapping(value = ["/get-usuarios/{id}"])
     fun findById(@PathVariable("id") id: String): ResponseEntity<Client> {
-        try {
-            val result = clientService.findClientById(id);
-            return ResponseEntity.status(HttpStatus.OK).body(result);
-        } catch (e: NotFoundException) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null)
-        }
+        val result = clientService.findClientById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     @PutMapping(value = ["/update-usuarios/{id}"])
     fun updatedClient(@PathVariable id: String, @RequestBody client: Client): ResponseEntity<String> {
-        try {
-            clientService.update(id, client);
-            return ResponseEntity.status(HttpStatus.OK).body("Alterado com sucesso")
-        } catch (e: ChangeSetPersister.NotFoundException) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Erro ao atualizar o client")
-        }
+        clientService.update(id, client);
+        return ResponseEntity.status(HttpStatus.OK).body("Alterado com sucesso")
     }
 
     @DeleteMapping(value = ["/delete-usuarios/{id}"])
     fun deleteById(@PathVariable("id") id: String): ResponseEntity<String> {
-        try {
-            clientService.delete(id)
-            return ResponseEntity.status(HttpStatus.OK).body("Deletado com sucesso")
-        } catch (e: Exception) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao deletar o client")
-        }
+        clientService.delete(id)
+        return ResponseEntity.status(HttpStatus.OK).body("Deletado com sucesso")
     }
 }
