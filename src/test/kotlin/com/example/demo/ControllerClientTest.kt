@@ -2,8 +2,10 @@ package com.example.demo
 
 import com.example.demo.controllers.ClientController
 import com.example.demo.domain.Client
+import com.example.demo.exceptions.CreateExpection
 import com.example.demo.services.ClientService
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -11,8 +13,12 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.jupiter.MockitoExtension
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.test.web.servlet.MockMvc
 import kotlin.test.assertNotNull
 
 @ExtendWith(MockitoExtension::class)
@@ -62,8 +68,8 @@ class ControllerClientTest {
 
     @Test
     fun findByIdController() {
+//        Mockito.`when`(client.id?.let { clientService.findClientById(it) }).thenReturn(client)
         Mockito.`when`(client.id?.let { clientService.findClientById(it) }).thenReturn(client)
-
         val result = clientController.findById(client.id!!)
         assertEquals(result.body, client)
         assertEquals(HttpStatus.OK, result.statusCode)
@@ -82,7 +88,7 @@ class ControllerClientTest {
 
         val result = clientController.updatedClient(client.id!!, client)
 
-        assertEquals(HttpStatus.CREATED, result.statusCode)
+        assertEquals(HttpStatus.OK, result.statusCode)
         assertEquals("Alterado com sucesso", result.body)
 
         Mockito.verify(clientService, Mockito.times(1)).update(client.id!!, client)
@@ -90,6 +96,23 @@ class ControllerClientTest {
 
     @Test
     fun deleteController() {
+        client.id?.let { Mockito.doNothing().`when`(clientService).delete(it) }
 
+        val result = clientController.deleteById(client.id!!)
+        assertEquals(HttpStatus.OK, result.statusCode)
+        assertEquals("Deletado com sucesso", result.body)
+
+        Mockito.verify(clientService, Mockito.times(1)).delete(client.id!!)
+    }
+
+    /*
+    * Casos de teste para erros
+    * */
+
+    @Test
+    fun createCaseError() {
+        Mockito.`when`(clientService.save(client)).thenThrow(CreateExpection("Erro ao tentar criar um novo usuário"))
+        val result = clientController.createdClient(client)
+        println(result)
     }
 }
